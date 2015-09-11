@@ -24,7 +24,7 @@ var config = {
     // Port designation
     port: 8080,
     // Base directory
-    base: "example/base",
+    base: "/home/raghav",
     // Default create mode
     cmode: "0755"
 };
@@ -33,6 +33,8 @@ var config = {
 var fs = require("fs-extra"),
     restify = require("restify"),
     server;
+
+var basicAuth = require('./util/auth');
 
 // Determine if SSL is used
 if (config.ssl.key && config.ssl.cert) {
@@ -134,16 +136,13 @@ var checkIP = function (config, req) {
  * Checks Key and IP Address
  */
  
-var checkReq = function (config, req, res) {
+var checkReq = function (config, req, res,next) {
     
     // Set access control headers
     res.header('Access-Control-Allow-Origin', '*');
-    
-    // Check key and IP
-    if(!checkKey(config, req) || !checkIP(config, req)) {
-        res.send(401);
-        return false;
-    }
+  
+     basicAuth.authenticate(req, res, next, function() {       
+    });
     
     return true;
 };
@@ -176,8 +175,9 @@ var resError = function (code, raw, res) {
  */
  
 var resSuccess = function (data, res) {
-
-    res.send({ "status": "success", "data": data });
+    
+    //res.send({ "status": "success", "data": data });
+    res.send(data);
 
 };
 
@@ -224,7 +224,7 @@ var checkPath = function (path) {
 server.get(commandRegEx, function (req, res, next) {
     
     // Check request
-    checkReq(config, req, res);
+    checkReq(config, req, res, next);
     
     // Set path
     var path = config.base + "/" + req.params[2];
@@ -316,7 +316,7 @@ server.get(commandRegEx, function (req, res, next) {
 server.post(commandRegEx, function (req, res, next) {
     
     // Check request
-    checkReq(config, req, res);
+    checkReq(config, req, res, next);
     
     // Set path
     var path = config.base + "/" + req.params[2];
@@ -390,7 +390,7 @@ server.post(commandRegEx, function (req, res, next) {
 server.put(commandRegEx, function (req, res, next) {
     
     // Check request
-    checkReq(config, req, res);
+    checkReq(config, req, res, next);
     
     // Set path
     var path = config.base + "/" + req.params[2];
@@ -448,7 +448,7 @@ server.put(commandRegEx, function (req, res, next) {
 server.del(pathRegEx, function (req, res, next) {
     
     // Check request
-    checkReq(config, req, res);
+    checkReq(config, req, res, next);
     
     // Set path
     var path = config.base + "/" + req.params[1];
