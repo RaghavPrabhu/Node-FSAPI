@@ -1,11 +1,7 @@
 // Define Configuration
 
 var config = {
-    // Authentication keys
-    keys: [
-        "12345",
-        "67890"
-    ],
+    
     /**
      * Allowed IP's or ranges
      * Can use * for wildcards, *.*.*.* for no restrictions
@@ -92,18 +88,6 @@ function unknownMethodHandler(req, res) {
 
 server.on('MethodNotAllowed', unknownMethodHandler);
 
-/**
- * Check Key (Called by checkReq)
- */
-var checkKey = function (config, req) {
-    // Loop through keys in config
-    for (var i = 0, z = config.keys.length; i < z; i++) {
-        if (config.keys[i] === req.params[0]) {
-            return true;
-        }
-    }
-    return false;
-};
 
 /**
  * Check IP (Called by checkReq)
@@ -141,6 +125,7 @@ var checkReq = function (config, req, res,next) {
     // Set access control headers
     res.header('Access-Control-Allow-Origin', '*');
   
+     //Passport basic authentication mechanism
      basicAuth.authenticate(req, res, next, function() {       
     });
     
@@ -176,8 +161,7 @@ var resError = function (code, raw, res) {
  
 var resSuccess = function (data, res) {
     
-    //res.send({ "status": "success", "data": data });
-    res.send(data);
+    res.send({ "status": "success", "data": data });
 
 };
 
@@ -325,12 +309,13 @@ server.post(commandRegEx, function (req, res, next) {
         
         // Creates a new directory
         case "dir":
-            
+           
             // Ensure base path
             if (checkPath(path)) {
+                 
                 // Base path exists, create directory
                 fs.mkdir(path, config.cmode, function () {
-                    resSuccess(null, res);
+                    resSuccess('Directory created successfully.', res);
                 });
             } else {
                 // Bad base path
@@ -344,6 +329,26 @@ server.post(commandRegEx, function (req, res, next) {
             if (checkPath(path)) {
                 // Base path exists, create file
                 fs.openSync(path, "w");
+                // Make sure it exists
+               if (fs.existsSync(path)) {
+                // Make sure it's a file
+                if (!fs.lstatSync(path).isDirectory()) {
+                    // Write
+                    fs.writeFile(path, req.body, function(err) {
+                        if(err) {
+                            resError(107, err, res);
+                        } else {
+                            resSuccess(null, res);
+                        }
+                    });
+                } else {
+                    resError(106, null, res);
+                }
+            } else {
+                resError(105, null, res);
+            }
+                
+                
                 resSuccess(null, res);
             } else {
                 // Bad base path
@@ -353,7 +358,7 @@ server.post(commandRegEx, function (req, res, next) {
         
         // Copies a file or directory
         // Supply destination as full path with file or folder name at end
-        // Ex: http://yourserver.com/{key}/copy/folder_a/somefile.txt, destination: /folder_b/somefile.txt
+        // Ex: http://yourserver.com/storageservice/copy/folder_a/somefile.txt, destination: /folder_b/somefile.txt
         case "copy":
             var destination = config.base + "/" + req.params.destination;
             if (checkPath(path) && checkPath(destination)) {
@@ -416,7 +421,7 @@ server.put(commandRegEx, function (req, res, next) {
                 // Make sure it's a file
                 if (!fs.lstatSync(path).isDirectory()) {
                     // Write
-                    fs.writeFile(path, req.params.data, function(err) {
+                    fs.writeFile(path, req.body, function(err) {
                         if(err) {
                             resError(107, err, res);
                         } else {
