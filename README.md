@@ -71,7 +71,7 @@ Requests to the server are made via RESTful methods - GET, PUT, POST and DELETE.
 **Create Directory**
 
 `POST => {server}:{port}/dir/{path}`
-   `Authorization: Basic XXXXXXXXXX`
+ `Authorization: Basic XXXXXXXXXX`
 
 **Create File**
 
