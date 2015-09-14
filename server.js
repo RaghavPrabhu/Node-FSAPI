@@ -325,21 +325,21 @@ server.post(commandRegEx, function (req, res, next) {
         
         case "file":
            
-          fs.readFile(req.files.image.path, function (err, data) {
+          fs.readFile(req.files.data.path, function (err, data) {
 		   
-            var imageName = req.files.image.name
+            var fileName = req.files.data.name
    		    
             /// If there's an error
-		    if(!imageName){
+		    if(!fileName){
    			  console.log("There was an error")
-			  res.redirect("/");
-			  res.end();
+			 resError(107, err, res);
+			 
 		} else {
 
 		  //var newPath = __dirname + "/uploads/fullsize/" + imageName;
             
           // Set path
-          var newPath = path + '/' +imageName;
+          var newPath = path + '/' +fileName;
 		  /// write file to uploads/fullsize folder
 		  fs.writeFile(newPath, data, function (err) {
 
