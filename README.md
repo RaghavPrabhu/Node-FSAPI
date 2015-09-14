@@ -12,7 +12,7 @@ and [node-fs-extra](https://github.com/jprichardson/node-fs-extra). The file con
 
 The server provides 3 levels of security:
 
-1. Key-Based: Each request requires a key be submitted in the URL
+1. Basic Auth: Each request requires a key be submitted in the URL
 2. IP Restrictions: Supports specific IP addresses and ranges using wildcards (`*`)
 3. HTTPS Support: Simply supplying a PEM-encoded key and certificate file will require HTTPS requests
 
@@ -58,25 +58,30 @@ Requests to the server are made via RESTful methods - GET, PUT, POST and DELETE.
 
 **Directory Listing**
 
-`GET => {server}:{port}/{key}/dir/{path}`
+`GET => {server}:{port}/dir/{path}`
+  `Authorization: Basic XXXXXXXXXX`
 
 **Read File**
 
-`GET => {server}:{port}/{key}/file/{path}`
+`GET => {server}:{port}/file/{path}`
+   `Authorization: Basic XXXXXXXXXX`
 
 ### POST (Create)
 
 **Create Directory**
 
-`POST => {server}:{port}/{key}/dir/{path}`
+`POST => {server}:{port}/dir/{path}`
+ `Authorization: Basic XXXXXXXXXX`
 
 **Create File**
 
-`POST => {server}:{port}/{key}/file/{path}`
+`POST => {server}:{port}/file/{path}`
+   `Authorization: Basic XXXXXXXXXX`
 
 **Copy Directory or File**
 
-`POST => {server}:{port}/{key}/copy/{path}`
+`POST => {server}:{port}/copy/{path}`
+   `Authorization: Basic XXXXXXXXXX`
 
 `POST` parameter `destination` required with the FULL detination path
 
@@ -84,13 +89,15 @@ Requests to the server are made via RESTful methods - GET, PUT, POST and DELETE.
 
 **Rename File or Directory**
 
-`PUT => {server}:{port}/{key}/rename/{path}`
+`PUT => {server}:{port}/rename/{path}`
+   `Authorization: Basic XXXXXXXXXX`
 
 `PUT` parameter `name` required with the new file or directory name (no path required)
 
 **Save Contents to File**
 
 `PUT => {server}:{port}/{key}/save/{path}`
+   `Authorization: Basic XXXXXXXXXX`
 
 `PUT` parameter `data` is required with the contents to be saved
 
@@ -98,7 +105,8 @@ Requests to the server are made via RESTful methods - GET, PUT, POST and DELETE.
 
 **Delete a File or Directory**
 
-`DELETE => {server}:{port}/{key}/{path}`
+`DELETE => {server}:{port}/{path}`
+   `Authorization: Basic XXXXXXXXXX`
 
 ## Responses
 
