@@ -20,7 +20,7 @@ var config = {
     // Port designation
     port: 8080,
     // Base directory
-    base: "/home/raghav",
+    base: "/home/raghav/storage",
     // Default create mode
     cmode: "0755"
 };
@@ -323,39 +323,38 @@ server.post(commandRegEx, function (req, res, next) {
             }
             break;
         
-        // Creates a new file
         case "file":
-            // Ensure base path
-            if (checkPath(path)) {
-                // Base path exists, create file
-                fs.openSync(path, "w");
-                // Make sure it exists
-               if (fs.existsSync(path)) {
-                // Make sure it's a file
-                if (!fs.lstatSync(path).isDirectory()) {
-                    // Write
-                    fs.writeFile(path, req.body, function(err) {
-                        if(err) {
-                            resError(107, err, res);
-                        } else {
-                            resSuccess(null, res);
-                        }
-                    });
-                } else {
-                    resError(106, null, res);
-                }
-            } else {
-                resError(105, null, res);
-            }
-                
-                
-                resSuccess(null, res);
-            } else {
-                // Bad base path
-                resError(103, null, res);
-            }
-            break;
+           
+          fs.readFile(req.files.image.path, function (err, data) {
+		   
+            var imageName = req.files.image.name
+   		    
+            /// If there's an error
+		    if(!imageName){
+   			  console.log("There was an error")
+			  res.redirect("/");
+			  res.end();
+		} else {
+
+		  //var newPath = __dirname + "/uploads/fullsize/" + imageName;
+            
+          // Set path
+          var newPath = path + '/' +imageName;
+		  /// write file to uploads/fullsize folder
+		  fs.writeFile(newPath, data, function (err) {
+
+		  if(err) {
+            resError(107, err, res);
+          } else {
+              resSuccess(null, res);
+         }
+
+		  });
+		}
+	});
+    break;
         
+               
         // Copies a file or directory
         // Supply destination as full path with file or folder name at end
         // Ex: http://yourserver.com/storageservice/copy/folder_a/somefile.txt, destination: /folder_b/somefile.txt
